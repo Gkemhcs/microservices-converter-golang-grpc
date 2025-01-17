@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In</title>
+    <script src="https://accounts.google.com/gsi/client" async></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+    <!-- Navbar (Same as home template) -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <a href="/" class="text-2xl font-bold text-blue-600">Converter</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <!-- No email and logout for sign-in page -->
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 py-16">
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <div class="text-center">
+                <h1 class="text-3xl font-semibold mb-4">Sign In to Continue</h1>
+                <p class="text-gray-600 mb-8">To access the Converter, sign in using your Google account.</p>
+
+                <!-- Google Sign-In Button -->
+                <div id="g_id_onload"
+                    data-client_id="27377431828-slhtq2am6nagu69kfmb4vn5pl8g8j4ma.apps.googleusercontent.com"
+                    data-context="signin"
+                    data-ux_mode="popup"
+                    data-login_uri="http://localhost:8080/user/google/auth/callback"
+                    data-auto_prompt="false">
+                </div>
+
+                <div class="g_id_signin w-full max-w-xs mx-auto mt-8"
+                    data-type="standard"
+                    data-shape="pill"
+                    data-theme="outline"
+                    data-text="signin_with"
+                    data-size="large"
+                    data-logo_alignment="left">
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-12">
+        <div class="max-w-6xl mx-auto px-4 py-8">
+            <div class="text-center">
+                <p>&copy; 2025 Converter. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

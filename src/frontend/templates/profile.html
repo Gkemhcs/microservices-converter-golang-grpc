@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <script src="https://accounts.google.com/gsi/client" async></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+    <!-- Navbar (Same as home template) -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <a href="/" class="text-2xl font-bold text-blue-600">Converter</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-gray-700"><a href="/user/profile">{{ .Email }}</a></span>
+                        <a href="/user/logout" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition duration-300">
+                            Logout
+                        </a>
+                        </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Profile Section -->
+        <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+            <div class="text-center">
+                <img src="{{ .ProfileImage }}" alt="Profile" class="w-24 h-24 rounded-full mx-auto mb-4">
+                <h2 class="text-2xl font-semibold mb-2">{{ .UserName }}</h2>
+                <p class="text-gray-600">{{ .Email }}</p>
+            </div>
+        </div>
+
+        <!-- Download History Table -->
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <h3 class="text-xl font-semibold mb-4">Download History</h3>
+            <table class="min-w-full table-auto border-collapse">
+                <thead>
+                    <tr>
+                        <th class="py-2 px-4 text-left border-b font-medium text-gray-700">Service Type</th>
+                        <th class="py-2 px-4 text-left border-b font-medium text-gray-700">Download URL</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{ range .Downloads }}
+                        <tr class="border-b">
+                            <td class="py-2 px-4 text-gray-700">{{ .ServiceType }}</td>
+                            <td class="py-2 px-4">
+                                <a href="{{ .DownloadURL }}" class="text-blue-600 hover:text-blue-700" target="_blank">
+                                    {{ .DownloadURL }}
+                                </a>
+                            </td>
+                        </tr>
+                    {{ else }}
+                        <tr>
+                            <td colspan="2" class="py-2 px-4 text-center text-gray-500">No download history yet</td>
+                        </tr>
+                    {{ end }}
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-12">
+        <div class="max-w-6xl mx-auto px-4 py-8">
+            <div class="text-center">
+                <p>&copy; 2025 Converter. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

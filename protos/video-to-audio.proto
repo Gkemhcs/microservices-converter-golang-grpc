@@ -1,0 +1,14 @@
+syntax="proto3";
+package proto ;
+option go_package="converter/proto";
+
+service VideoToAudioConverterService{
+    rpc Convert(stream ConvertVideoToAudioRequest) returns (ConvertVideoToAudioResponse){}
+
+}
+message ConvertVideoToAudioRequest{
+    bytes chunk = 1;
+}
+message ConvertVideoToAudioResponse{
+    string url=1;
+}

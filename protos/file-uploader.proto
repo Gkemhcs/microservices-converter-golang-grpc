@@ -1,0 +1,13 @@
+    syntax="proto3";
+    package proto ;
+    option go_package="converter/proto";
+    service FileUploaderService{
+        rpc Upload(stream FileChunk) returns (UploadResponse){}
+
+    }
+    message FileChunk{
+        bytes content = 1;
+    }
+    message UploadResponse{
+        string url=1;
+    }

@@ -1,0 +1,14 @@
+syntax="proto3";
+package proto ;
+option go_package="converter/proto";
+
+service TextToSpeechConverterService{
+    rpc Convert(ConvertTextToSpeechRequest) returns (ConvertTextToSpeechResponse){}
+
+}
+message ConvertTextToSpeechRequest{
+    string text = 1;
+}
+message ConvertTextToSpeechResponse{
+    string url=1;
+}

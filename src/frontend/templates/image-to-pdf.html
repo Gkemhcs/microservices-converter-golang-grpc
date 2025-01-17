@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image to PDF Converter</title>
+    <script src="https://accounts.google.com/gsi/client" async></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+    <!-- Navbar (Same as home template) -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <a href="/" class="text-2xl font-bold text-blue-600">Converter</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    {{ if .Email }}
+                        <span class="text-gray-700"><a href="/user/profile">{{ .Email }}</a></span>
+                        <a href="/user/logout" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition duration-300">
+                            Logout
+                        </a>
+                    {{ else }}
+                            <div id="g_id_onload"
+                            data-client_id="27377431828-slhtq2am6nagu69kfmb4vn5pl8g8j4ma.apps.googleusercontent.com"
+                            data-context="signin"
+                            data-ux_mode="popup"
+                            data-login_uri="http://localhost:8080/user/google/auth/callback"
+                            data-auto_prompt="false">
+                    </div>
+                    
+                    <div class="g_id_signin"
+                            data-type="standard"
+                            data-shape="pill"
+                            data-theme="outline"
+                            data-text="signin_with"
+                            data-size="large"
+                            data-logo_alignment="left">
+                    </div>   
+                    {{ end }}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Service Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold mb-4">Image to PDF Converter</h1>
+            <p class="text-gray-600">Convert your image files to a single PDF in seconds</p>
+        </div>
+
+        <!-- Converter Card -->
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <div class="text-center mb-8">
+                <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-image text-4xl text-blue-600"></i>
+                </div>
+                <h2 class="text-2xl font-semibold mb-2">Upload Your Image File</h2>
+                <p class="text-gray-600">Supported formats: JPG, PNG, GIF, BMP, etc.</p>
+            </div>
+
+            <!-- Upload Form -->
+            <form action="/services/image-to-pdf/convert" method="POST" enctype="multipart/form-data" class="space-y-6">
+                <!-- File Drop Zone -->
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-blue-500 transition duration-300" id="dropZone">
+                    <input type="file" name="images" id="fileInput" accept="image/*" multiple class="hidden" required>
+                    <div class="space-y-4">
+                        <i class="fas fa-cloud-upload-alt text-4xl text-gray-400"></i>
+                        <div>
+                            <p class="text-gray-600">Drag and drop your image file here</p>
+                            <p class="text-gray-500 text-sm">or</p>
+                            <button type="button" onclick="document.getElementById('fileInput').click()" class="mt-2 text-blue-600 hover:text-blue-700 font-medium">
+                                Browse Files
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Convert Button -->
+                <div class="text-center">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition duration-300">
+                        Convert to PDF
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Features Section -->
+        <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="text-center">
+                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <i class="fas fa-bolt text-green-600"></i>
+                </div>
+                <h3 class="font-semibold mb-2">Fast Conversion</h3>
+                <p class="text-gray-600">Convert image to PDF in seconds</p>
+            </div>
+            <div class="text-center">
+                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <i class="fas fa-file-pdf text-blue-600"></i>
+                </div>
+                <h3 class="font-semibold mb-2">High Quality</h3>
+                <p class="text-gray-600">Maintain original image quality in the PDF</p>
+            </div>
+            <div class="text-center">
+                <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <i class="fas fa-check-circle text-purple-600"></i>
+                </div>
+                <h3 class="font-semibold mb-2">Easy to Use</h3>
+                <p class="text-gray-600">Simple and user-friendly interface</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-12">
+        <div class="max-w-6xl mx-auto px-4 py-8">
+            <div class="text-center">
+                <p>&copy; 2025 Converter. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript for file upload handling -->
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+
+        // Prevent default drag behaviors
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+            document.body.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    </script>
+</body>
+</html>

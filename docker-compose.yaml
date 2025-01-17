@@ -1,0 +1,220 @@
+name: Microservices-Converter-Demo
+
+services:
+  frontend:
+      build:
+        context: src/frontend
+      container_name: frontend 
+      ports:
+      - 8080:8080
+      networks:
+      - network1
+      environment:
+      - DOCKER_ENVIRONMENT=true
+      - LOG_DIR=/root/logs
+      - GOOGLE_CLIENT_ID=27377431828-slhtq2am6nagu69kfmb4vn5pl8g8j4ma.apps.googleusercontent.com
+      - GOOGLE_CLIENT_SECRET=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
+      - REDIRECT_CALLBACK_URL=http://localhost:8080/google/auth/callback
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_SECRET=idwoeoejinkwnks
+      - TEXT_TO_SPEECH_HOST=text-to-speech
+      - TEXT_TO_SPEECH_PORT=8081
+      - VIDEO_TO_AUDIO_HOST=video-to-audio
+      - VIDEO_TO_AUDIO_PORT=8082
+      - IMAGE_TO_PDF_HOST=image-to-pdf
+      - IMAGE_TO_PDF_PORT=8083
+      - OTLP_COLLECTOR_HOST=otel-collector
+      - OTLP_COLLECTOR_PORT=4318
+      - SERVER_HOST=0.0.0.0
+      - SERVER_PORT=8080
+      - POSTGRES_USER=converter
+      - POSTGRES_PASSWORD=converter1234
+      - POSTGRES_DB=converter
+      - POSTGRES_HOST=postgres 
+      - POSTGRES_PORT=5432
+     
+      volumes:
+      - ./logs:/root/logs
+      depends_on:
+       redis:
+          condition: service_started
+       text-to-speech:
+          condition: service_started
+       postgres:
+          condition: service_healthy
+       
+  text-to-speech:
+      build:
+        context: src/text-to-speech 
+      container_name: text-to-speech 
+      ports:
+      - 8081:8081 
+      networks:
+      - network1
+      environment:
+      - FILE_UPLOADER_HOST=file-uploader
+      - FILE_UPLOADER_PORT=8084
+      - OTLP_COLLECTOR_HOST=otel-collector
+      - OTLP_COLLECTOR_PORT=4318
+      - SERVER_HOST=0.0.0.0
+      - SERVER_PORT=8081
+  video-to-audio:
+      build:
+        context: src/video-to-audio 
+      container_name: video-to-audio 
+      ports:
+      - 8082:8082
+      networks:
+      - network1
+      environment:
+      - DOCKER_ENVIRONMENT=true
+      - LOG_DIR=/root/logs
+      - FILE_UPLOADER_HOST=file-uploader
+      - FILE_UPLOADER_PORT=8084
+      - OTLP_COLLECTOR_HOST=otel-collector
+      - OTLP_COLLECTOR_PORT=4318
+      - SERVER_HOST=0.0.0.0
+      - SERVER_PORT=8082
+      volumes:
+      - ./logs:/root/logs
+
+  image-to-pdf:
+      build:
+        context: src/image-to-pdf
+      container_name: image-to-pdf 
+      ports:
+      - 8083:8083 
+      networks:
+      - network1
+      environment:
+      - FILE_UPLOADER_HOST=file-uploader
+      - FILE_UPLOADER_PORT=8084
+      - OTLP_COLLECTOR_HOST=otel-collector 
+      - OTLP_COLLECTOR_PORT=4318
+      - SERVER_HOST=0.0.0.0
+      - SERVER_PORT=8083
+  file-uploader:
+      build:
+        context: src/file-uploader
+        
+      container_name: file-uploader
+      ports:
+      - 8084:8084
+      networks:
+      - network1
+      environment:
+      - DOCKER_ENVIRONMENT=true
+      - LOG_DIR=/root/logs
+      - GOOGLE_APPLICATION_CREDENTIALS=/root/key.json
+      - GCP_SERVICE_ACCOUNT=nyx-demo-sa-local@deep-clock-413313.iam.gserviceaccount.com
+      - OTLP_COLLECTOR_HOST=otel-collector
+      - OTLP_COLLECTOR_PORT=4318
+      - SERVER_HOST=0.0.0.0
+      - SERVER_PORT=8084
+      - GCS_BUCKET_NAME=nyx-stager-bucket
+      volumes:
+      - ./key.json:/root/key.json:ro
+      - ./logs:/root/logs
+  
+  otel-collector:
+    image: otel/opentelemetry-collector:latest
+    container_name: otel-collector
+    ports:
+      - "4317:4317" # OTLP gRPC endpoint
+      - "4318:4318" # OTLP HTTP endpoint
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    command:
+      --config=/etc/otel-collector-config.yaml
+    networks:
+    - network1
+    
+
+  zipkin:
+    image: openzipkin/zipkin:latest
+    ports:
+      - "9411:9411"
+     # Jaeger Agent
+    networks:
+    - network1
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: ["redis-server", "--save", "60", "1", "--loglevel", "warning"]
+    networks:
+    - network1 
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      POSTGRES_USER: converter
+      POSTGRES_PASSWORD: converter1234
+      POSTGRES_DB: converter
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+    - network1
+  fluentd:
+    image: fluent/fluentd-kubernetes-daemonset:v1.17.1-debian-elasticsearch7-1.0
+    container_name: fluentd
+    volumes:
+      - ./fluentd.conf:/fluentd/etc/fluent.conf:ro
+      - ./logs:/app/logs
+    ports:
+      - "24224:24224"
+      - "24224:24224/udp"
+    depends_on:
+      
+        elasticsearch:
+           condition: service_healthy
+    networks:
+    - network1
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.10.2
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+    - network1
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:9200/_cat/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.10.2
+    container_name: kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+        elasticsearch:
+           condition: service_healthy
+    networks:
+    - network1 
+
+
+networks:
+    network1:
+      driver: bridge
+volumes:
+   redis-data:
+   postgres_data:
+   elasticsearch_data:

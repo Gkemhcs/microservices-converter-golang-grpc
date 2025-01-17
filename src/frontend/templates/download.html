@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Your File</title>
+    <script src="https://accounts.google.com/gsi/client" async></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+    <!-- Navbar (Same as home template) -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <a href="/" class="text-2xl font-bold text-blue-600">Converter</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    {{ if .Email }}
+                        <span class="text-gray-700"><a href="/user/profile">{{ .Email }}</a></span>
+                        <a href="/user/logout" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition duration-300">
+                            Logout
+                        </a>
+                    {{ else }}
+                            <div id="g_id_onload"
+                            data-client_id="27377431828-slhtq2am6nagu69kfmb4vn5pl8g8j4ma.apps.googleusercontent.com"
+                            data-context="signin"
+                            data-ux_mode="popup"
+                            data-login_uri="http://localhost:8080/user/google/auth/callback"
+                            data-auto_prompt="false">
+                    </div>
+                    
+                    <div class="g_id_signin"
+                            data-type="standard"
+                            data-shape="pill"
+                            data-theme="outline"
+                            data-text="signin_with"
+                            data-size="large"
+                            data-logo_alignment="left">
+                    </div>   
+                    {{ end }}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Service Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold mb-4">Download Your Converted File</h1>
+            <p class="text-gray-600">Your file is ready to download</p>
+        </div>
+
+        <!-- Download Card -->
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <div class="text-center mb-8">
+                <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-download text-4xl text-green-600"></i>
+                </div>
+                <h2 class="text-2xl font-semibold mb-2">Download Your File</h2>
+                <p class="text-gray-600">Click the button below to download your converted file</p>
+            </div>
+
+            <!-- Download Button -->
+            <div class="text-center">
+                {{ if .Url }}
+                <a href="{{ .Url }}" target="_blank" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition duration-300">
+                    <i class="fas fa-file-download mr-2"></i> Download Now
+                </a>
+                {{ else }}
+                <a href="/" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition duration-300">
+                    <i class="fas fa-file-download mr-2"></i> Download Now
+                </a>
+                {{ end }}
+            </div>
+        </div>
+
+        <!-- Features Section (Optional) -->
+        <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="text-center">
+                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <i class="fas fa-check-circle text-green-600"></i>
+                </div>
+                <h3 class="font-semibold mb-2">Secure</h3>
+                <p class="text-gray-600">Your files are safe and deleted after download</p>
+            </div>
+            <div class="text-center">
+                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <i class="fas fa-cloud-download-alt text-blue-600"></i>
+                </div>
+                <h3 class="font-semibold mb-2">Fast Download</h3>
+                <p class="text-gray-600">Get your files instantly</p>
+            </div>
+            <div class="text-center">
+                <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <i class="fas fa-file-alt text-purple-600"></i>
+                </div>
+                <h3 class="font-semibold mb-2">High Quality</h3>
+                <p class="text-gray-600">Files are converted with the highest quality</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-12">
+        <div class="max-w-6xl mx-auto px-4 py-8">
+            <div class="text-center">
+                <p>&copy; 2025 Converter. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

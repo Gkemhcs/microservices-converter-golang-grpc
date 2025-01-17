@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package image_to_pdf;
+option go_package="converter/proto";
+service ImageToPdfConverterService {
+  rpc Convert (stream ConvertImageToPdfRequest) returns (ConvertImageToPdfResponse);
+}
+
+message ConvertImageToPdfRequest {
+  bytes image_chunk = 1;
+  bool end_of_image = 2; // Indicates the end of an image
+}
+
+message ConvertImageToPdfResponse {
+  string pdf_path = 1;
+}

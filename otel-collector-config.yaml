@@ -1,0 +1,25 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+exporters:
+  zipkin:
+    endpoint: "http://zipkin:9411/api/v2/spans" # Zipkin HTTP endpoint
+  debug:
+    verbosity: detailed  # Log traces for debugging
+
+processors:
+  batch:
+    # Batches traces before exporting them
+    timeout: 1s
+
+service:
+  pipelines:
+    traces:
+      receivers: [ otlp ] # Accept traces via OTLP
+      processors: [ batch ] # Batch traces
+      exporters: [ debug, zipkin ] # Export to Zipkin and log traces
