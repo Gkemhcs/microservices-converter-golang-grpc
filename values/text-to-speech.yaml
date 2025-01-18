@@ -1,0 +1,11 @@
+name: text-to-speech
+namespace: default
+image: gkemhcs/text-to-speech-microservice-golang:v1
+port: 8081
+env:
+  FILE_UPLOADER_HOST: "file-uploader.file-uploader-ns"
+  FILE_UPLOADER_PORT: "8084"
+  OTLP_COLLECTOR_HOST: "otel-collector-collector.observability-ns"
+  OTLP_COLLECTOR_PORT: "4318"
+  SERVER_HOST: "0.0.0.0"
+  SERVER_PORT: "8081"

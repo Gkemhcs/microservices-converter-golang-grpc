@@ -1,0 +1,26 @@
+name: frontend
+namespace: frontend-ns
+image: gkemhcs/frontend-microservice-golang:v1
+port: 8080
+env:
+  GOOGLE_CLIENT_ID: GOOGLE_CLIENT_ID_CREDS
+  GOOGLE_CLIENT_SECRET: GOOGLE_CLIENT_SECRET_CREDS
+  REDIRECT_CALLBACK_URL: "http://localhost:8080/google/auth/callback"
+  REDIS_HOST: "redis.database-ns"
+  REDIS_PORT: "6379"
+  REDIS_SECRET: "idwoeoejinkwnks"
+  TEXT_TO_SPEECH_HOST: "text-to-speech.text-to-speech-ns"
+  TEXT_TO_SPEECH_PORT: "8081"
+  VIDEO_TO_AUDIO_HOST: "video-to-audio.video-to-audio-ns"
+  VIDEO_TO_AUDIO_PORT: "8082"
+  IMAGE_TO_PDF_HOST: "image-to-pdf.image-to-pdf-ns"
+  IMAGE_TO_PDF_PORT: "8083"
+  OTLP_COLLECTOR_HOST: "otel-collector-collector.observability-ns"
+  OTLP_COLLECTOR_PORT: "4318"
+  SERVER_HOST: "0.0.0.0"
+  SERVER_PORT: "8080"
+  POSTGRES_USER: "converter"
+  POSTGRES_PASSWORD: "converter1234"
+  POSTGRES_DB: "converter"
+  POSTGRES_HOST: "postgres.database-ns"
+  POSTGRES_PORT: "5432"

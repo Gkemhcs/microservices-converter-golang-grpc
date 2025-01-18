@@ -1,0 +1,11 @@
+name: video-to-audio
+namespace: default
+image: gkemhcs/video-to-audio-microservice-golang:v1
+port: 8082
+env:
+  FILE_UPLOADER_HOST: "file-uploader.file-uploader-ns"
+  FILE_UPLOADER_PORT: "8084"
+  OTLP_COLLECTOR_HOST: "otel-collector-collector.observability-ns"
+  OTLP_COLLECTOR_PORT: "4318"
+  SERVER_HOST: "0.0.0.0"
+  SERVER_PORT: "8082"

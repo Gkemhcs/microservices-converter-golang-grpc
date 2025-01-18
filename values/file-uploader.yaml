@@ -1,0 +1,22 @@
+name: file-uploader
+namespace: file-uploader-ns
+image: gkemhcs/file-uploader-microservice-golang:v2
+port: 8084
+
+createSecret: true
+secretName: gcp-creds
+env:
+      GOOGLE_APPLICATION_CREDENTIALS: /var/run/secrets/key.json
+      GCP_SERVICE_ACCOUNT: GCP_SERVICE_ACCOUNT_NAME
+      OTLP_COLLECTOR_HOST: otel-collector-collector.observability-ns
+      OTLP_COLLECTOR_PORT: 4318
+      SERVER_HOST: 0.0.0.0
+      SERVER_PORT: 8084
+      GCS_BUCKET_NAME: GCS_BUCKET
+
+volumes:
+    - name: gcp-creds-volume
+      secret: gcp-creds
+volumeMounts:
+    - name: gcp-creds-volume
+      mountPath: /var/run/secrets

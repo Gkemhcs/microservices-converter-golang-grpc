@@ -1,0 +1,84 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: observability-ns
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zipkin
+  namespace: observability-ns
+  labels:
+    app: zipkin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zipkin
+  template:
+    metadata:
+      labels:
+        app: zipkin
+    spec:
+      containers:
+      - name: zipkin
+        image: openzipkin/zipkin:latest
+        ports:
+        - containerPort: 9411
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zipkin
+  namespace: observability-ns
+  labels:
+    app: zipkin
+spec:
+  type: ClusterIP
+  ports:
+  - port: 9411
+    targetPort: 9411
+    protocol: TCP
+    name: http
+  selector:
+    app: zipkin
+---
+apiVersion: opentelemetry.io/v1beta1
+kind: OpenTelemetryCollector
+metadata:
+  name: otel-collector
+  namespace: observability-ns
+spec:
+  config:
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+          http:
+            endpoint: 0.0.0.0:4318
+
+    exporters:
+      zipkin:
+        endpoint: "http://zipkin:9411/api/v2/spans" # Zipkin HTTP endpoint
+      debug:
+        verbosity: detailed # Log traces for debugging
+
+    processors:
+      batch:
+        # Batches traces before exporting them
+        timeout: 1s
+
+    service:
+      pipelines:
+        traces:
+          receivers: [ otlp ] # Accept traces via OTLP
+          processors: [ batch ] # Batch traces
+          exporters: [ debug, zipkin ] # Export to Zipkin and log traces

@@ -1,0 +1,4 @@
+name: frontend
+namespace: default
+image: frontend-image
+port: 8080

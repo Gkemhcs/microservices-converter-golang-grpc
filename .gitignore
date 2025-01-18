@@ -1,3 +1,8 @@
 **/**.json
 compose/*
 logs/**
+docker-compose-backup.yaml
+fluentd-backup.conf
+values/**-backup.yaml
+
+compose/** 

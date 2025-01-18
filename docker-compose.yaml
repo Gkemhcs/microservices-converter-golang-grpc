@@ -12,8 +12,8 @@ services:
       environment:
       - DOCKER_ENVIRONMENT=true
       - LOG_DIR=/root/logs
-      - GOOGLE_CLIENT_ID=27377431828-slhtq2am6nagu69kfmb4vn5pl8g8j4ma.apps.googleusercontent.com
-      - GOOGLE_CLIENT_SECRET=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
+      - GOOGLE_CLIENT_ID=GOOGLE_CLIENT_ID_CREDS
+      - GOOGLE_CLIENT_SECRET=GOOGLE_CLIENT_SECRET_CREDS
       - REDIRECT_CALLBACK_URL=http://localhost:8080/google/auth/callback
       - REDIS_HOST=redis
       - REDIS_PORT=6379
@@ -107,12 +107,12 @@ services:
       - DOCKER_ENVIRONMENT=true
       - LOG_DIR=/root/logs
       - GOOGLE_APPLICATION_CREDENTIALS=/root/key.json
-      - GCP_SERVICE_ACCOUNT=nyx-demo-sa-local@deep-clock-413313.iam.gserviceaccount.com
+      - GCP_SERVICE_ACCOUNT=GCP_SERVICE_ACCOUNT_NAME
       - OTLP_COLLECTOR_HOST=otel-collector
       - OTLP_COLLECTOR_PORT=4318
       - SERVER_HOST=0.0.0.0
       - SERVER_PORT=8084
-      - GCS_BUCKET_NAME=nyx-stager-bucket
+      - GCS_BUCKET_NAME=GCS_BUCKET
       volumes:
       - ./key.json:/root/key.json:ro
       - ./logs:/root/logs
@@ -169,9 +169,13 @@ services:
   fluentd:
     image: fluent/fluentd-kubernetes-daemonset:v1.17.1-debian-elasticsearch7-1.0
     container_name: fluentd
+    environment:
+    - FLUENT_ELASTICSEARCH_HOST=elasticsearch 
+    - FLUENT_ELASTICSEARCH_PORT=9200
+    - FLUENT_ELASTICSEARCH_SCHEME=http
     volumes:
       - ./fluentd.conf:/fluentd/etc/fluent.conf:ro
-      - ./logs:/app/logs
+      - ./logs:/root/logs
     ports:
       - "24224:24224"
       - "24224:24224/udp"
@@ -186,6 +190,7 @@ services:
     container_name: elasticsearch
     environment:
       - discovery.type=single-node
+      - xpack.security.enabled=false
     ports:
       - "9200:9200"
     volumes:
