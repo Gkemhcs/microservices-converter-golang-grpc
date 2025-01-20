@@ -30,5 +30,5 @@ func NewLogger() *logrus.Logger {
 	// Set the logging level (e.g., Debug, Info, Warn, Error)
 	logger.SetLevel(logrus.DebugLevel)
 
-	return logger.WithField("service", "file-uploader").Logger
+	return logger
 }

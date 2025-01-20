@@ -11,6 +11,7 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/redis"
 	"github.com/gin-gonic/gin"
+	ginprometheus "github.com/zsais/go-gin-prometheus"
 	"go.opentelemetry.io/otel"
 )
 
@@ -36,28 +37,32 @@ func main() {
 
 	router := gin.Default()
 
+	// Initialize the Prometheus middleware
+	p := ginprometheus.NewPrometheus("gin")
+	p.Use(router)
+
 	logger := utils.NewLogger()
 	router.Use(middleware.LoggingMiddleware(logger))
 
 	router.Use(sessions.Sessions("converter-frontend", store))
-	
+
 	router.Static("/static", "./static")
 	router.LoadHTMLGlob("templates/*")
-	
+
 	cleanup := utils.InitTracer("frontend", logger)
 	defer cleanup()
 
 	tracer := otel.Tracer("frontend")
 
-	dbConn,err:=utils.ConnectToDB(logger)
-	if err !=nil {
+	dbConn, err := utils.ConnectToDB(logger)
+	if err != nil {
 		panic(err)
 	}
 	dbClient := handlers.DBClient{
 		DB: dbConn,
 	}
-	routes.SetupUserRoutes(router, logger,&dbClient)
-	routes.SetupServiceRoutes(router, logger, &tracer,&dbClient)
+	routes.SetupUserRoutes(router, logger, &dbClient)
+	routes.SetupServiceRoutes(router, logger, &tracer, &dbClient)
 	router.GET("/", func(c *gin.Context) {
 		_, span := tracer.Start(c.Request.Context(), "home-route")
 		defer span.End()
@@ -70,17 +75,15 @@ func main() {
 		}
 		c.HTML(http.StatusOK, "home.html", gin.H{"Email": email.(string)})
 	})
-	router.GET("/health",healthCheck)
-
+	router.GET("/health", healthCheck)
 
 	router.Run(fmt.Sprintf("%s:%s", HOST, PORT)) // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
 
+func healthCheck(c *gin.Context) {
 
-func healthCheck(c *gin.Context){
-
-	c.JSON(http.StatusOK,gin.H{
-		"status":"succeeded",
-	  "message":"server receiving requests",
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "succeeded",
+		"message": "server receiving requests",
 	})
 }
