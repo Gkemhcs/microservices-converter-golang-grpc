@@ -366,7 +366,7 @@ networkPolicy:
 luaScripts:
   setIndex.lua: |
     function set_index(tag, timestamp, record)
-        index = "microservices-demo"
+        index = "microservices-converter-logs"
         if record["kubernetes"] ~= nil then
             if record["kubernetes"]["namespace_name"] == "logging" then
                 return -1, timestamp, record  -- Skip logs from the logging namespace
@@ -442,7 +442,7 @@ config:
         Host elasticsearch-master
         Port 9200
         HTTP_User elastic
-        HTTP_Passwd sME34huc5fZ1ST0G
+        HTTP_Passwd 8yvdNi2zzUgE4Ask
         tls On
         tls.verify Off
         Logstash_Format On
@@ -457,7 +457,7 @@ config:
         Host elasticsearch-master
         Port 9200
         HTTP_User elastic
-        HTTP_Passwd sME34huc5fZ1ST0G
+        HTTP_Passwd 8yvdNi2zzUgE4Ask
         tls On
         tls.verify Off
         Logstash_Format On

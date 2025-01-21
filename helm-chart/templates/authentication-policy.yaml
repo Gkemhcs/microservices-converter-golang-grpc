@@ -1,0 +1,13 @@
+{{-  if .Values.enableAuthenticationPolicy }}
+apiVersion: security.istio.io/v1
+kind: PeerAuthentication
+metadata:
+  name: {{ .Values.name }}-peer-policy
+  
+spec:
+  selector:
+    matchLabels:
+      app:  {{ .Values.name }}
+  mtls:
+    mode: STRICT
+{{- end }}

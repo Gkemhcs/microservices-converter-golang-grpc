@@ -326,17 +326,32 @@ func main() {
       helm repo add fluent https://fluent.github.io/helm-charts
       helm install fluent-bit fluent/fluent-bit -f values/fluentbit-values.yaml -n logging
       ```
+6. **Create Application Namespaces and add the namespaces to mesh**
+  ```sh
+  kubectl create ns frontend-ns 
+  kubectl create ns text-to-speech-ns
+  kubectl create ns video-to-audio-ns
+  kubectl create ns image-to-pdf-ns
+  kubectl create ns file-uploader-ns
 
-6. **Deploy the services using Helm**:
+  #Add labels to namespace to add namespaces to istio ambient mesh
+  kubectl label namespace frontend-ns istio.io/dataplane-mode=ambient
+  kubectl label namespace text-to-speech-ns istio.io/dataplane-mode=ambient
+  kubectl label namespace video-to-audio-ns istio.io/dataplane-mode=ambient
+  kubectl label namespace image-to-pdf-ns istio.io/dataplane-mode=ambient
+  kubectl label namespace file-uploader-ns istio.io/dataplane-mode=ambient
+  
+  ```
+7. **Deploy the services using Helm**:
     ```sh
-    helm install frontend ./helm-chart/ -f values/frontend.yaml --namespace frontend-ns --create-namespace
-    helm install text-to-speech ./helm-chart/ -f values/text-to-speech.yaml --namespace text-to-speech-ns --create-namespace
-    helm install video-to-audio ./helm-chart/ -f values/video-to-audio.yaml --namespace video-to-audio-ns --create-namespace
-    helm install image-to-pdf ./helm-chart/ -f values/image-to-pdf.yaml --namespace image-to-pdf-ns --create-namespace
-    helm install file-uploader ./helm-chart/ -f values/file-uploader.yaml --namespace file-uploader-ns --create-namespace --set-file keyJson=./key.json
+    helm install frontend ./helm-chart/ -f values/frontend.yaml --namespace frontend-ns 
+    helm install text-to-speech ./helm-chart/ -f values/text-to-speech.yaml --namespace text-to-speech-ns 
+    helm install video-to-audio ./helm-chart/ -f values/video-to-audio.yaml --namespace video-to-audio-ns 
+    helm install image-to-pdf ./helm-chart/ -f values/image-to-pdf.yaml --namespace image-to-pdf-ns 
+    helm install file-uploader ./helm-chart/ -f values/file-uploader.yaml --namespace file-uploader-ns  --set-file keyJson=./key.json
     ```
 
-7. **Port Forward services to access them locally**:
+8. **Port Forward services to access them locally**:
  ```sh
  # Website Frontend 
  kubectl port-forward svc/frontend -n frontend-ns 8080:8080
@@ -346,7 +361,7 @@ func main() {
  kubectl port-forward svc/zipkin -n observability-ns 9411:9411
  ``` 
 
-8. **Access the services**:
+9. **Access the services**:
     - Frontend: `http://localhost:8080`
     - Text-to-Speech: `http://localhost:8081`
     - Video-to-Audio: `http://localhost:8082`

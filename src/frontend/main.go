@@ -86,4 +86,4 @@ func healthCheck(c *gin.Context) {
 		"status":  "succeeded",
 		"message": "server receiving requests",
 	})
-}
+}	

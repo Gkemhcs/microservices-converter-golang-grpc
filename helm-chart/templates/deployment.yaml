@@ -8,11 +8,14 @@ spec:
   selector:
     matchLabels:
       app: {{ .Values.name }}
+
   template:
     metadata:
       labels:
         app: {{ .Values.name }}
+        
     spec:
+      serviceAccountName: {{ .Values.name }}-sa
       containers:
         - name: {{ .Values.name }}
           image: {{ .Values.image }}
