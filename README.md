@@ -88,6 +88,10 @@ converter-gcp/
 ![Trace Spans](assets/trace-spans.png)
 *Trace Spans*
 
+![Istio Traffic Graph](assets/istio-traffic-flow.png)
+*Istio Traffic Graph*
+
+
 
 ## gRPC Explanation
 
@@ -343,7 +347,7 @@ func main() {
       helm repo add fluent https://fluent.github.io/helm-charts
       helm install fluent-bit fluent/fluent-bit -f values/fluentbit-values.yaml -n logging
       ```
-6. Install **ISTIO SERVICE MESH** into cluster in sidecar mode  
+6. **Install **ISTIO SERVICE MESH** into cluster in sidecar mode**
 - First install istioctl to operate with istio
 
   ```sh
