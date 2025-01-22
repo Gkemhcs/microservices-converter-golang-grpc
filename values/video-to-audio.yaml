@@ -1,6 +1,6 @@
 name: video-to-audio
 namespace: default
-image: gkemhcs/video-to-audio-microservice-golang:v1
+image: gkemhcs/video-to-audio-microservice-golang:v2
 httpPort: 9090
 grpcPort: 8082
 env:

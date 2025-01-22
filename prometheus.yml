@@ -1,0 +1,19 @@
+global:
+  scrape_interval: 15s  # Scrape every 15 seconds
+
+scrape_configs:
+  - job_name: 'frontend'
+    static_configs:
+      - targets: ['frontend:8080']
+  - job_name: 'text-to-speech'
+    static_configs:
+      - targets: ['text-to-speech:9090']
+  - job_name: 'video-to-audio'
+    static_configs:
+      - targets: ['video-to-audio:9090']
+  - job_name: 'image-to-pdf'
+    static_configs:
+      - targets: ['image-to-pdf:9090']
+  - job_name: 'file-uploader'
+    static_configs:
+      - targets: ['file-uploader:9090']

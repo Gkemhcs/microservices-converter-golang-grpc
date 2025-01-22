@@ -1,6 +1,6 @@
 name: image-to-pdf
 namespace: default
-image: gkemhcs/image-to-pdf-microservice-golang:v1
+image: gkemhcs/image-to-pdf-microservice-golang:v2
 httpPort: 9090
 grpcPort: 8083
 env:

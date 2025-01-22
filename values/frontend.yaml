@@ -1,6 +1,6 @@
 name: frontend
 namespace: frontend-ns
-image: gkemhcs/frontend-microservice-golang:v1
+image: gkemhcs/frontend-microservice-golang:v3
 httpPort: 8080
 env:
   GOOGLE_CLIENT_ID: GOOGLE_CLIENT_ID_CREDS

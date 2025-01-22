@@ -1,6 +1,6 @@
 name: file-uploader
 namespace: file-uploader-ns
-image: gkemhcs/file-uploader-microservice-golang:v2
+image: gkemhcs/file-uploader-microservice-golang:v4
 httpPort: 9090
 grpcPort: 8084
 createSecret: true
