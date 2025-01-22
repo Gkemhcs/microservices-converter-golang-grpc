@@ -1,6 +1,6 @@
 name: text-to-speech
 namespace: default
-image: gkemhcs/text-to-speech-microservice-golang:v2
+image: gkemhcs/text-to-speech-microservice-golang:v3  
 httpPort: 9090
 grpcPort: 8081
 env:

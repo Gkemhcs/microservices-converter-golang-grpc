@@ -32,8 +32,8 @@ var (
 	// Gauge for active gRPC requests
 	GRPCRouteLatencyGauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "http_route_latency_seconds",
-			Help: "Gauge of the current latency (seconds) for each route",
+			Name: "grpc_method_latency_seconds",
+			Help: "Gauge of the current latency (seconds) for each method",
 		},
 		[]string{"service", "method", "status"},
 	)

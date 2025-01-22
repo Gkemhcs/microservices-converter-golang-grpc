@@ -5,11 +5,13 @@ import (
 	"converter/file-uploader/interceptors"
 	"converter/file-uploader/service"
 	"converter/file-uploader/utils"
+	"net/http"
+
 	"fmt"
+	"net"
 	"os"
 
-	"net"
-
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/otel"
 	"google.golang.org/grpc"
@@ -34,13 +36,22 @@ func main() {
 	if err != nil {
 		logger.Fatalf("Error creating FileUploaderServer: %v", err)
 	}
+	interceptors.InitMetrics()
 
 	// Create gRPC server
 	grpcServer := grpc.NewServer(grpc.StatsHandler(otelgrpc.NewServerHandler()),
-				  				 grpc.ChainUnaryInterceptor(interceptors.UnaryLoggingInterceptor(logger)),
-				 			     grpc.ChainStreamInterceptor(interceptors.StreamLoggingInterceptor(logger)))
+		grpc.ChainUnaryInterceptor(interceptors.UnaryLoggingInterceptor(logger)),
+		grpc.ChainStreamInterceptor(interceptors.StreamLoggingInterceptor(logger), interceptors.PrometheusStreamInterceptor()))
 	pb.RegisterFileUploaderServiceServer(grpcServer, server)
 
+	go func() {
+		http.Handle("/metrics", promhttp.Handler())
+		logger.Info("server started")
+		err := http.ListenAndServe(":9090", nil)
+		if err != nil {
+			logger.Panic(err)
+		} // Prometheus metrics endpoint
+	}()
 	// Start listening
 	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%s", SERVER_HOST, SERVER_PORT))
 	if err != nil {

@@ -1,7 +1,8 @@
 name: video-to-audio
 namespace: default
 image: gkemhcs/video-to-audio-microservice-golang:v1
-port: 8082
+httpPort: 9090
+grpcPort: 8082
 env:
   FILE_UPLOADER_HOST: "file-uploader.file-uploader-ns"
   FILE_UPLOADER_PORT: "8084"
