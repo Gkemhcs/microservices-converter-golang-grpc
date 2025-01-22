@@ -24,4 +24,4 @@ env:
   POSTGRES_DB: "converter"
   POSTGRES_HOST: "postgres.database-ns"
   POSTGRES_PORT: "5432"
-enableAuthenticationPolicy: true
+enableAuthenticationPolicy: false
