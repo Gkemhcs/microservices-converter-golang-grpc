@@ -16,7 +16,7 @@ var (
 			Name: "grpc_requests_total",
 			Help: "Total number of gRPC requests",
 		},
-		[]string{"service", "method", "status"},
+		[]string{"method", "type", "status"},
 	)
 
 	// Histogram for gRPC request durations
@@ -26,7 +26,7 @@ var (
 			Help:    "Histogram of gRPC request durations in seconds",
 			Buckets: prometheus.DefBuckets,
 		},
-		[]string{"service", "method", "status"},
+		[]string{"method", "type", "status"},
 	)
 
 	// Gauge for active gRPC requests
@@ -35,7 +35,7 @@ var (
 			Name: "grpc_method_latency_seconds",
 			Help: "Gauge of the current latency (seconds) for each method",
 		},
-		[]string{"service", "method", "status"},
+		[]string{"method", "type", "status"},
 	)
 )
 
