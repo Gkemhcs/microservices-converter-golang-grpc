@@ -245,7 +245,13 @@ func main() {
 
 4. **Build and run the services**:
     ```sh
-    docker-compose up --build
+    docker-compose up --build -d
+
+    # For enabling  logging stack run the below command using logging profile
+    docker compose --profile logging up -d
+
+    # For enabling monitoring stack in our application run the below command to enable monitoring profile
+    docker compose --profile monitoring up -d
     ```
 
 5. **Service URLs and Ports**:
