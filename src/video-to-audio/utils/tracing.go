@@ -17,14 +17,15 @@ import (
 )
 
 var (
-	OTLP_COLLECTOR_HOST=GetEnv("OTLP_COLLECTOR_HOST","localhost")
-	OTLP_COLLECTOR_PORT=GetEnv("OTLP_COLLECTOR_PORT","4318")
+	OTLP_COLLECTOR_HOST = GetEnv("OTLP_COLLECTOR_HOST", "localhost")
+	OTLP_COLLECTOR_PORT = GetEnv("OTLP_COLLECTOR_PORT", "4318")
 )
+
 // Initialize tracing and return a cleanup function
 func InitTracer(serviceName string, logger *logrus.Logger) func() {
 	// Create OTLP exporter to send trace data to the collector
 	exporter, err := otlptracehttp.New(context.Background(),
-		otlptracehttp.WithEndpoint(fmt.Sprintf("%s:%s",OTLP_COLLECTOR_HOST,OTLP_COLLECTOR_PORT)), // Use the HTTP endpoint of the collector
+		otlptracehttp.WithEndpoint(fmt.Sprintf("%s:%s", OTLP_COLLECTOR_HOST, OTLP_COLLECTOR_PORT)), // Use the HTTP endpoint of the collector
 		otlptracehttp.WithInsecure(),
 	)
 	if err != nil {
@@ -41,13 +42,13 @@ func InitTracer(serviceName string, logger *logrus.Logger) func() {
 	)
 
 	otel.SetTracerProvider(tp)
-	
+
 	otel.SetTextMapPropagator(
-        propagation.NewCompositeTextMapPropagator(
-            propagation.TraceContext{},
-            propagation.Baggage{},
-        ),
-    )
+		propagation.NewCompositeTextMapPropagator(
+			propagation.TraceContext{},
+			propagation.Baggage{},
+		),
+	)
 
 	return func() {
 		_ = tp.Shutdown(context.Background())

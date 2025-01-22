@@ -1,0 +1,15 @@
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: video-to-audio-authorization-policy
+  namespace: video-to-audio-ns
+spec:
+  selector:
+    matchLabels:
+      app: video-to-audio
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/frontend-ns/sa/frontend-sa

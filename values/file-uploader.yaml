@@ -20,4 +20,4 @@ volumes:
 volumeMounts:
     - name: gcp-creds-volume
       mountPath: /var/run/secrets
-enableAuthenticationPolicy: false
+enableAuthenticationPolicy: true

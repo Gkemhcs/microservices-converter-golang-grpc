@@ -1,7 +1,7 @@
 # Microservices Converter Demo
 
-### **Note:-** ⚠️ 
-**Google Sign-In can only be displayed on HTTPS domains, not HTTP. For testing and development purposes, we can use it on localhost. Therefore, to use this feature, access the service on localhost to make it work.**
+### **Note:-** 
+**⚠️ Google Sign-In can only be displayed on HTTPS domains, not HTTP. For testing and development purposes, we can use it on localhost. Therefore, to use this feature, we access the service on localhost to make it work.**
 
 ## Overview
 
@@ -14,10 +14,10 @@ Our website provides a user-friendly interface for performing media conversions.
 | Service Name   | Purpose                                                                 | Stack Used                                                                 | Port |
 |----------------|-------------------------------------------------------------------------|----------------------------------------------------------------------------|------|
 | Frontend       | Provides a user interface for interacting with the various conversion services. | Gin, Logrus, gRPC, PostgreSQL, OpenTelemetry                               | 8080 |
-| File Uploader  | A gRPC service that uploads received files via chunks to Google Cloud Storage and generates signed URLs. | gRPC, Logrus, Google Cloud Storage, OpenTelemetry                          | 8084 |
-| Image-to-PDF   | A gRPC service that converts image chunks to PDF and sends the PDF chunks to the File Uploader for a signed URL. | gRPC, Logrus, OpenTelemetry, github.com/signintech/gopdf                   | 8083 |
-| Video-to-Audio | A gRPC service that converts video chunks to audio and sends the audio chunks to the File Uploader for a signed URL. | gRPC, Logrus, OpenTelemetry, FFmpeg, github.com/u2takey/ffmpeg-go          | 8082 |
-| Text-to-Speech | A gRPC service that converts text to speech and sends the audio chunks to the File Uploader for a signed URL. | gRPC, Logrus, OpenTelemetry, github.com/Duckduckgot/gtts                   | 8081 |
+| File Uploader  | A gRPC service that uploads received files via chunks to Google Cloud Storage and generates signed URLs. | gRPC, Logrus, Google Cloud Storage, OpenTelemetry                          | grpc:8084, metrics-port:9090 |
+| Image-to-PDF   | A gRPC service that converts image chunks to PDF and sends the PDF chunks to the File Uploader for a signed URL. | gRPC, Logrus, OpenTelemetry, github.com/signintech/gopdf                   | grpc:8083,metrics-port:9090 |
+| Video-to-Audio | A gRPC service that converts video chunks to audio and sends the audio chunks to the File Uploader for a signed URL. | gRPC, Logrus, OpenTelemetry, FFmpeg, github.com/u2takey/ffmpeg-go          | grpc:8082,metrics-port:9090 |
+| Text-to-Speech | A gRPC service that converts text to speech and sends the audio chunks to the File Uploader for a signed URL. | gRPC, Logrus, OpenTelemetry, github.com/Duckduckgot/gtts                   | grpc:8081, metrics-port:9090 |
 | Postgres | Database to store the generated signed URLs | PostgreSQL | 5432 |
 | OpenTelemetry Collector | Otel Collector to collect traces from applications via endpoints, process them, and export them to Zipkin for visualization of traces | OpenTelemetry | **HTTP**: 4318 **gRPC**: 4317 **Zipkin**: 9411 |
 | EFK Stack | Logging stack: **Fluentd** for forwarding logs to storage, **Elasticsearch** for storing logs in the form of indices for faster retrieval, and **Kibana** for visualizing logs stored in Elasticsearch | Elasticsearch, Fluentd, Kibana | Kibana: 5601, Elasticsearch: 9200 |
@@ -213,17 +213,24 @@ func main() {
     ![sample config](assets/google-signin-console-section.png)
     *Sample Screenshot of configuration*
 3. **Create GCP Bucket and Service Account Key**:
+   - Enter your project id with billing account linked
+      ```sh
+      echo "ENTER YOUR GOOGLE PROJECT ID"
+      read PROJECT_ID
+      ```
    - Create a GCP bucket for storing files:
      ```sh
-     gsutil mb gs://your-bucket-name
+     export BUCKET_NAME="microservices-converter-bucket-${PROJECT_ID}"
+     gsutil mb gs://$BUCKET_NAME
      ```
    - Create a service account key with **Storage Admin** permissions:
      ```sh
-     gcloud iam service-accounts create your-service-account --display-name "Service Account for Storage Admin"
-     gcloud projects add-iam-policy-binding your-project-id --member "serviceAccount:your-service-account@your-project-id.iam.gserviceaccount.com" --role "roles/storage.admin"
-     gcloud iam service-accounts keys create key.json --iam-account your-service-account@your-project-id.iam.gserviceaccount.com
+     export GCP_SA="gcs-uploader@${PROJECT_ID}.iam.gserviceaccount.com"
+     gcloud iam service-accounts create gcs-uploader --display-name "Service Account for Storage Admin"
+     gcloud projects add-iam-policy-binding $PROJECT_ID --member "serviceAccount:$GCP_SA" --role "roles/storage.admin"
+     gcloud iam service-accounts keys create key.json --iam-account $GCP_SA
      ```
-   - Download the service account key JSON file and place it in the project root directory.
+   - Copy the Downloaded file key.json to project directory
 
 ### Docker Deployment 
 
@@ -260,6 +267,10 @@ func main() {
     - Video-to-Audio: `http://localhost:8082`
     - Image-to-PDF: `http://localhost:8083`
     - File Uploader: `http://localhost:8084`
+    - Kibana: `http://localhost:5601`
+    - Grafana: `http://localhost:3000`
+    - Zipkin: `http://localhost:9411`
+    - Prometheus: `http://localhost:9090`
 
 ### Kubernetes Deployment
 
@@ -286,20 +297,20 @@ func main() {
       kubectl apply -f k8s-templates/databases-deployment.yaml
       ```
     - Before deploying OpenTelemetry operator manifests, first deploy the Cert-Manager and OpenTelemetry Operators:
-     ```sh
-      # install cert-manager
-      helm repo add jetstack https://charts.jetstack.io
-      helm repo update
-      helm install \
-        --create-namespace \
-        --namespace cert-manager \
-        --set installCRDs=true \
-        --set global.leaderElection.namespace=cert-manager \
-        --set extraArgs={--issuer-ambient-credentials=true} \
-        cert-manager jetstack/cert-manager
-      # install opentelemetry operator
-      kubectl apply -f https://github.com/open-telemetry/opentelemetry-operator/releases/latest/download/opentelemetry-operator.yaml
-     ``` 
+      ```sh
+        # install cert-manager
+        helm repo add jetstack https://charts.jetstack.io
+        helm repo update
+        helm install \
+          --create-namespace \
+          --namespace cert-manager \
+          --set installCRDs=true \
+          --set global.leaderElection.namespace=cert-manager \
+          --set extraArgs={--issuer-ambient-credentials=true} \
+          cert-manager jetstack/cert-manager
+        # install opentelemetry operator
+        kubectl apply -f https://github.com/open-telemetry/opentelemetry-operator/releases/latest/download/opentelemetry-operator.yaml
+      ``` 
     - Deploy OpenTelemetry Collector and Zipkin:
       ```sh
       kubectl apply -f k8s-templates/observability.yaml
@@ -332,23 +343,41 @@ func main() {
       helm repo add fluent https://fluent.github.io/helm-charts
       helm install fluent-bit fluent/fluent-bit -f values/fluentbit-values.yaml -n logging
       ```
-6. **Create Application Namespaces and add the namespaces to mesh**
-  ```sh
-  kubectl create ns frontend-ns 
-  kubectl create ns text-to-speech-ns
-  kubectl create ns video-to-audio-ns
-  kubectl create ns image-to-pdf-ns
-  kubectl create ns file-uploader-ns
+6. Install **ISTIO SERVICE MESH** into cluster in sidecar mode  
+- First install istioctl to operate with istio
 
-  #Add labels to namespace to add namespaces to istio ambient mesh
-  kubectl label namespace frontend-ns istio.io/dataplane-mode=ambient
-  kubectl label namespace text-to-speech-ns istio.io/dataplane-mode=ambient
-  kubectl label namespace video-to-audio-ns istio.io/dataplane-mode=ambient
-  kubectl label namespace image-to-pdf-ns istio.io/dataplane-mode=ambient
-  kubectl label namespace file-uploader-ns istio.io/dataplane-mode=ambient
-  
+  ```sh
+  curl -sL https://istio.io/downloadIstioctl | sh -
+  export PATH=$HOME/.istioctl/bin:$PATH
   ```
-7. **Deploy the services using Helm**:
+- Install **Istio** resources into cluster 
+
+    ```sh
+    istioctl install --set meshConfig.accessLogFile=/dev/stdout
+
+    # deploy prometheus integration in istio-system namespaces 
+    kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.24/samples/addons/prometheus.yaml
+
+    # deploy kiali  integration in istio-system namespace to visualise the mesh
+    kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.24/samples/addons/kiali.yaml
+    ```
+
+7. **Create Application Namespaces and add the namespaces to mesh**
+    ```sh
+    kubectl create ns frontend-ns 
+    kubectl create ns text-to-speech-ns
+    kubectl create ns video-to-audio-ns
+    kubectl create ns image-to-pdf-ns
+    kubectl create ns file-uploader-ns
+
+    #Add labels to namespace to add namespaces to istio sidecar mesh
+    kubectl label namespace frontend-ns istio-injection=enabled
+    kubectl label namespace text-to-speech-ns istio-injection=enabled
+    kubectl label namespace video-to-audio-ns istio-injection=enabled
+    kubectl label namespace image-to-pdf-ns istio-injection=enabled
+    kubectl label namespace file-uploader-ns istio-injection=enabled
+    ```
+8. **Deploy the services using Helm**:
     ```sh
     helm install frontend ./helm-chart/ -f values/frontend.yaml --namespace frontend-ns 
     helm install text-to-speech ./helm-chart/ -f values/text-to-speech.yaml --namespace text-to-speech-ns 
@@ -356,18 +385,24 @@ func main() {
     helm install image-to-pdf ./helm-chart/ -f values/image-to-pdf.yaml --namespace image-to-pdf-ns 
     helm install file-uploader ./helm-chart/ -f values/file-uploader.yaml --namespace file-uploader-ns  --set-file keyJson=./key.json
     ```
+9. **Deploy Istio AuthorizationPolices to restrict the traffic to the application workloads in mesh**
+    ```sh
+    kubectl apply -f k8s-templates/istio/
+    ```
 
-8. **Port Forward services to access them locally**:
- ```sh
- # Website Frontend 
- kubectl port-forward svc/frontend -n frontend-ns 8080:8080
- # Logs Dashboard 
- kubectl port-forward svc/kibana-kibana -n logging 5601:5601
- # Traces Dashboard
- kubectl port-forward svc/zipkin -n observability-ns 9411:9411
- ``` 
+10. **Port Forward services to access them locally**:
+    ```sh
+    # Website Frontend 
+    kubectl port-forward svc/frontend -n frontend-ns 8080:8080
+    # Logs Dashboard 
+    kubectl port-forward svc/kibana-kibana -n logging 5601:5601
+    # Traces Dashboard
+    kubectl port-forward svc/zipkin -n observability-ns 9411:9411
+    # start kiali dashboard 
+    istioctl dashboard kiali
+    ``` 
 
-9. **Access the services**:
+11. **Access the services**:
     - Frontend: `http://localhost:8080`
     - Text-to-Speech: `http://localhost:8081`
     - Video-to-Audio: `http://localhost:8082`
@@ -375,6 +410,7 @@ func main() {
     - File Uploader: `http://localhost:8084`
     - Kibana: `http://localhost:5601`
     - Zipkin: `http://localhost:9411`
+    - Istio Kiali Dashboard:`http://localhost:20001`
 
 ## Usage
 

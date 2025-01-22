@@ -33,7 +33,6 @@ func ClientStreamLoggingInterceptor(logger *logrus.Logger) grpc.StreamClientInte
 	}
 }
 
-
 // StreamLoggingInterceptor logs streaming requests
 func ServerStreamLoggingInterceptor(logger *logrus.Logger) grpc.StreamServerInterceptor {
 	return func(
