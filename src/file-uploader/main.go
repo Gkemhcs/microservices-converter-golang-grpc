@@ -46,7 +46,7 @@ func main() {
 
 	go func() {
 		http.Handle("/metrics", promhttp.Handler())
-		logger.Info("server started")
+		logger.Info("metrics server started")
 		err := http.ListenAndServe(":9090", nil)
 		if err != nil {
 			logger.Panic(err)

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 
 	"net"
 
@@ -11,6 +12,7 @@ import (
 	"converter/image-to-pdf/services"
 	"converter/image-to-pdf/utils"
 
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/otel"
 	"google.golang.org/grpc"
@@ -33,10 +35,22 @@ func main() {
 		logger.Panic("failed to start uploaderClient:-", err)
 	}
 	server := services.NewImageToPdfServer(logger, uploaderClient, tracer)
+
+	interceptors.InitMetrics()
+
 	grpcServer := grpc.NewServer(grpc.StatsHandler(otelgrpc.NewServerHandler()),
-		grpc.ChainStreamInterceptor(interceptors.ServerStreamLoggingInterceptor(logger)))
-		
+		grpc.ChainStreamInterceptor(interceptors.ServerStreamLoggingInterceptor(logger), interceptors.PrometheusStreamInterceptor()))
+
 	pb.RegisterImageToPdfConverterServiceServer(grpcServer, server)
+
+	go func() {
+		http.Handle("/metrics", promhttp.Handler())
+		logger.Info("metrics server started")
+		err := http.ListenAndServe(":9090", nil)
+		if err != nil {
+			logger.Panic(err)
+		} // Prometheus metrics endpoint
+	}()
 
 	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%s", SERVER_HOST, SERVER_PORT))
 	if err != nil {

@@ -8,7 +8,9 @@ import (
 	"converter/video-to-audio/utils"
 	"fmt"
 	"net"
+	"net/http"
 
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/otel"
 	"google.golang.org/grpc"
@@ -32,9 +34,20 @@ func main() {
 	}
 	tracer := otel.Tracer("video-to-audio-converter")
 	server := service.NewVideoToAudioServer(logger, uploaderClient, tracer)
-	grpcServer := grpc.NewServer(grpc.StatsHandler(otelgrpc.NewServerHandler()),
-		grpc.ChainStreamInterceptor(interceptors.ServerStreamLoggingInterceptor(logger)))
 
+	interceptors.InitMetrics()
+
+	grpcServer := grpc.NewServer(grpc.StatsHandler(otelgrpc.NewServerHandler()),
+		grpc.ChainStreamInterceptor(interceptors.ServerStreamLoggingInterceptor(logger), interceptors.PrometheusStreamInterceptor()))
+
+	go func() {
+		http.Handle("/metrics", promhttp.Handler())
+		logger.Info("metrics server started")
+		err := http.ListenAndServe(":9090", nil)
+		if err != nil {
+			logger.Panic(err)
+		} // Prometheus metrics endpoint
+	}()
 	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%s", SERVER_HOST, SERVER_PORT))
 	if err != nil {
 		logger.Fatal("error while starting to listen on port,", err)
