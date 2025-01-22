@@ -1,7 +1,8 @@
 name: text-to-speech
 namespace: default
-image: gkemhcs/text-to-speech-microservice-golang:v1
-port: 8081
+image: gkemhcs/text-to-speech-microservice-golang:v2
+httpPort: 9090
+grpcPort: 8081
 env:
   FILE_UPLOADER_HOST: "file-uploader.file-uploader-ns"
   FILE_UPLOADER_PORT: "8084"

@@ -9,6 +9,16 @@ spec:
   selector:
     app: {{ .Values.name }}
   ports:
+    {{- if .Values.httpPort }}  
     - protocol: TCP
-      port: {{ .Values.port }}
-      targetPort: {{ .Values.port }}
+      name: http-web
+      port: {{ .Values.httpPort }}
+      targetPort: {{ .Values.httpPort }}
+    {{- end }}
+    {{- if .Values.grpcPort }}  
+    - protocol: TCP
+      name: grpc-web
+      port: {{ .Values.grpcPort }}
+      targetPort: {{ .Values.grpcPort }}
+    {{- end }}
+    

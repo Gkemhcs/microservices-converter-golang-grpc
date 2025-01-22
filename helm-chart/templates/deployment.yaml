@@ -21,7 +21,16 @@ spec:
           image: {{ .Values.image }}
           imagePullPolicy: Always
           ports:
-            - containerPort: {{ .Values.port }}
+          {{- if .Values.grpcPort }}
+          # Port for gRPC
+            - name: grpc
+              containerPort: {{ .Values.grpcPort }}
+          {{- end }}
+          {{- if .Values.httpPort }}
+            # Port for Prometheus metrics (HTTP)
+            - name: http
+              containerPort: {{ .Values.httpPort }}
+          {{- end }}  
           env:
             {{- range $key, $value := .Values.env }}
             - name: {{ $key }}

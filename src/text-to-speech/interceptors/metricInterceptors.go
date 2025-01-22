@@ -35,9 +35,14 @@ var (
 			Name: "http_route_latency_seconds",
 			Help: "Gauge of the current latency (seconds) for each route",
 		},
-		[]string{"service","method", "status"},
+		[]string{"service", "method", "status"},
 	)
 )
+
+func InitMetrics() {
+	// Register custom metrics with Prometheus
+	prometheus.MustRegister(GRPCRequestsTotal, GRPCRequestDuration, GRPCRouteLatencyGauge)
+}
 
 func PrometheusInterceptor() grpc.UnaryServerInterceptor {
 	return func(
@@ -51,8 +56,6 @@ func PrometheusInterceptor() grpc.UnaryServerInterceptor {
 		// Handle the request
 		resp, err := handler(ctx, req)
 
-		// Decrement active requests
-
 		// Record the request
 		statusCode := "OK"
 		if err != nil {
@@ -61,7 +64,7 @@ func PrometheusInterceptor() grpc.UnaryServerInterceptor {
 		duration := time.Since(start).Seconds()
 		GRPCRequestsTotal.WithLabelValues(info.FullMethod, "Unary", statusCode).Inc()
 		GRPCRequestDuration.WithLabelValues(info.FullMethod, "Unary", statusCode).Observe(duration)
-		GRPCRouteLatencyGauge.WithLabelValues(info.FullMethod, "Unary",statusCode).Set(duration)
+		GRPCRouteLatencyGauge.WithLabelValues(info.FullMethod, "Unary", statusCode).Set(duration)
 		return resp, err
 	}
 }

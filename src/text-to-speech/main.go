@@ -29,12 +29,7 @@ var (
 )
 
 
-func Init() {
-	// Register Prometheus metrics
-	prometheus.MustRegister(interceptors.GRPCRequestsTotal)
-	prometheus.MustRegister(interceptors.GRPCRequestDuration)
-	prometheus.MustRegister(interceptors.GRPCRouteLatencyGauge)
-}
+
 
 func main() {
 
@@ -51,6 +46,7 @@ func main() {
 	}
 	
 	pdfToTextSpeechServer := service.NewTextToSpeechServer(logger, uploaderClient, tracer)
+	interceptors.InitMetrics()
 	grpcServer := grpc.NewServer(grpc.StatsHandler(otelgrpc.NewServerHandler()),
 	grpc.ChainUnaryInterceptor(interceptors.UnaryLoggingInterceptor(logger),interceptors.PrometheusInterceptor()))
 	
