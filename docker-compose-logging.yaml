@@ -1,0 +1,58 @@
+services:
+  elasticsearch:
+    profiles:
+      - logging
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.12.0
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - xpack.security.enabled=false
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9200"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+    - network1
+
+  fluentd:
+    profiles:
+      - logging
+    build:
+      context: .
+      dockerfile: Dockerfile.fluentd
+    container_name: fluentd
+    volumes:
+      - ./fluent.conf:/fluentd/etc/fluent.conf
+      - ./logs:/logs
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    ports:
+      - "24224:24224"
+      - "24224:24224/udp"
+    networks:
+    - network1 
+
+
+  kibana:
+    profiles:
+      - logging
+    image: docker.elastic.co/kibana/kibana:8.12.0
+    container_name: kibana
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    networks:
+    - network1
+volumes:
+ elasticseach_data:

@@ -1,0 +1,31 @@
+services:
+  prometheus:
+      profiles:
+      - monitoring 
+      image: prom/prometheus:v2.38.0
+      container_name: prometheus
+      ports:
+        - "9090:9090"  # Prometheus UI will be accessible on http://localhost:9090
+      volumes:
+        - ./prometheus.yml:/etc/prometheus/prometheus.yml  # Mount the prometheus config file
+      restart: unless-stopped
+      networks:
+      - network1 
+  grafana:
+    image: grafana/grafana:latest
+    profiles:
+    - monitoring 
+    container_name: grafana
+    ports:
+      - "3000:3000"  # Grafana UI accessible at http://localhost:3000
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin         # Default username
+      - GF_SECURITY_ADMIN_PASSWORD=admin123 # Default password
+    volumes:
+      - grafana_data:/var/lib/grafana        # Persist data (e.g., dashboards, plugins)
+    depends_on:
+      - prometheus  # Ensure Prometheus is available for Grafana to fetch data
+    networks:
+      - network1  # Ensure it's on the same network as Prometheus
+volumes:
+     grafana_data: 
