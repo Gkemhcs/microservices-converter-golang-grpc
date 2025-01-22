@@ -11,7 +11,9 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/redis"
 	"github.com/gin-gonic/gin"
-	ginprometheus "github.com/zsais/go-gin-prometheus"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+
 	"go.opentelemetry.io/otel"
 )
 
@@ -27,8 +29,14 @@ var (
 
 	HOST = utils.GetEnv("SERVER_HOST", "0.0.0.0")
 	PORT = utils.GetEnv("SERVER_PORT", "8080")
-)
 
+	
+)
+func init(){
+	prometheus.MustRegister(middleware.HttpRequestsTotal)
+	prometheus.MustRegister(middleware.HttpRequestDuration)
+	prometheus.MustRegister(middleware.RouteLatencyGauge)
+}
 func main() {
 	store, err := redis.NewStore(10, "tcp", fmt.Sprintf("%s:%s", REDIS_HOST, REDIS_PORT), "", []byte("secret-key"))
 	if err != nil {
@@ -37,12 +45,9 @@ func main() {
 
 	router := gin.Default()
 
-	// Initialize the Prometheus middleware
-	p := ginprometheus.NewPrometheus("gin")
-	p.Use(router)
-
 	logger := utils.NewLogger()
 	router.Use(middleware.LoggingMiddleware(logger))
+	router.Use(middleware.PrometheusMiddleware())
 
 	router.Use(sessions.Sessions("converter-frontend", store))
 
@@ -77,6 +82,9 @@ func main() {
 	})
 	router.GET("/health", healthCheck)
 
+	// Prometheus metrics
+	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
+
 	router.Run(fmt.Sprintf("%s:%s", HOST, PORT)) // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
 
@@ -86,4 +94,4 @@ func healthCheck(c *gin.Context) {
 		"status":  "succeeded",
 		"message": "server receiving requests",
 	})
-}	
+}
