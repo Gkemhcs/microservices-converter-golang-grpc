@@ -1,5 +1,4 @@
 name: image-to-pdf
-namespace: default
 image: gkemhcs/image-to-pdf-microservice-golang:v2
 httpPort: 9090
 grpcPort: 8083
@@ -11,3 +10,7 @@ env:
   SERVER_HOST: "0.0.0.0"
   SERVER_PORT: "8083"
 enableAuthenticationPolicy: true
+AuthorizationPolicy:
+  enabled: true
+  allowedPrincipals:
+  - cluster.local/ns/frontend-ns/sa/frontend-sa

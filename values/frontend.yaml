@@ -1,5 +1,4 @@
 name: frontend
-namespace: frontend-ns
 image: gkemhcs/frontend-microservice-golang:v3
 httpPort: 8080
 env:

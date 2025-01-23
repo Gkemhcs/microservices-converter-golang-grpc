@@ -1,6 +1,5 @@
 name: text-to-speech
-namespace: default
-image: gkemhcs/text-to-speech-microservice-golang:v4 
+image: gkemhcs/text-to-speech-microservice-golang:v4
 httpPort: 9090
 grpcPort: 8081
 env:
@@ -11,3 +10,7 @@ env:
   SERVER_HOST: "0.0.0.0"
   SERVER_PORT: "8081"
 enableAuthenticationPolicy: true
+AuthorizationPolicy:
+  enabled: true
+  allowedPrincipals:
+  - cluster.local/ns/frontend-ns/sa/frontend-sa

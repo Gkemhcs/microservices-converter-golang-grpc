@@ -1,0 +1,20 @@
+{{- if .Values.AuthorizationPolicy.enabled }}
+
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: {{ .Values.name }}-authorization-policy
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.name }}
+  action: DENY
+  rules:
+  - from:
+    - source:
+        notPrincipals:
+        {{- range .Values.AuthorizationPolicy.allowedPrincipals }}
+        - {{ . }}
+        {{- end }}
+
+{{- end }}

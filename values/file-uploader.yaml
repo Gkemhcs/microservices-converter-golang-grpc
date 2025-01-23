@@ -1,5 +1,4 @@
 name: file-uploader
-namespace: file-uploader-ns
 image: gkemhcs/file-uploader-microservice-golang:v4
 httpPort: 9090
 grpcPort: 8084
@@ -21,3 +20,9 @@ volumeMounts:
     - name: gcp-creds-volume
       mountPath: /var/run/secrets
 enableAuthenticationPolicy: true
+AuthorizationPolicy:
+  enabled: true
+  allowedPrincipals:
+   - cluster.local/ns/video-to-audio-ns/sa/video-to-audio-sa
+   - cluster.local/ns/text-to-speech-ns/sa/text-to-speech-sa
+   - cluster.local/ns/image-to-pdf-ns/sa/image-to-pdf-sa

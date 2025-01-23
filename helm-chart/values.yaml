@@ -2,3 +2,5 @@ name: frontend
 namespace: default
 image: frontend-image
 port: 8080
+AuthorizationPolicy:
+  enabled: false
