@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest 
     steps:
       - name : "print"
-        run: echo "${{github.event.head_commit}}"
+        run: echo "${{toJson(github.event.head_commit)}}"
   build-and-push-frontend:
     if: contains(github.event.head_commit.modified, 'src/frontend/') || contains(github.event.head_commit.added, 'src/frontend/') || contains(github.event.head_commit.removed, 'src/frontend/')
     runs-on: ubuntu-latest
