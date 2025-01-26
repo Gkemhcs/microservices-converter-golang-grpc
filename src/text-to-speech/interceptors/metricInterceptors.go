@@ -13,7 +13,7 @@ var (
 	// Counter for gRPC requests
 	GRPCRequestsTotal = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "grpc_requests_total",
+			Name: "grpc_stream_requests_total",
 			Help: "Total number of gRPC requests",
 		},
 		[]string{"method", "type", "status"},
@@ -22,7 +22,7 @@ var (
 	// Histogram for gRPC request durations
 	GRPCRequestDuration = prometheus.NewHistogramVec(
 		prometheus.HistogramOpts{
-			Name:    "grpc_request_duration_seconds",
+			Name:    "grpc_stream_request_duration_seconds",
 			Help:    "Histogram of gRPC request durations in seconds",
 			Buckets: prometheus.DefBuckets,
 		},
