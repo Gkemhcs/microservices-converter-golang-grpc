@@ -14,7 +14,7 @@ var (
 	GRPCRequestsTotal = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "grpc_stream_requests_total",
-			Help: "Total number of gRPC requests",
+			Help: "Total number of GRPC requests",
 		},
 		[]string{"method", "type", "status"},
 	)
