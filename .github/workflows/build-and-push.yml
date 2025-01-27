@@ -1,13 +1,16 @@
 name: Build and Push Docker Images
+
 on:
   push:
     paths:
       - 'src/frontend/**'
-jobs:  
+
+jobs:
   build-and-push-frontend:
+   
     runs-on: ubuntu-latest
     steps:
-      - name: checkout repo
+      - name: checkout repo 
         uses: actions/checkout@v4
       - name: Build and Push Frontend Image
         uses: ./.github/actions/build-and-push
@@ -15,6 +18,8 @@ jobs:
           service-name: 'frontend'
           dockerfile-path: 'src/frontend/Dockerfile'
           context: 'src/frontend'
-          tag: 'latest'
+          tag: "${{github.sha}}"
+          dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
+          dockerhub-password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-  
+ 
