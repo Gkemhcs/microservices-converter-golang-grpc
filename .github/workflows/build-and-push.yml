@@ -7,6 +7,8 @@ jobs:
   build-and-push-frontend:
     runs-on: ubuntu-latest
     steps:
+      - name: checkout repo
+        uses: actions/checkout@v4
       - name: Build and Push Frontend Image
         uses: ./.github/actions/build-and-push
         with:
