@@ -40,7 +40,7 @@ var (
 )
 
 func InitMetrics() {
-	// Register custom metrics with Prometheus
+	// Register custom metrics with  Prometheus 
 	prometheus.MustRegister(GRPCRequestsTotal, GRPCRequestDuration, GRPCRouteLatencyGauge)
 }
 

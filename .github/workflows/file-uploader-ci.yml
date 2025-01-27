@@ -1,0 +1,25 @@
+name: Build and Push File Uploader Image
+
+on:
+  push:
+    paths:
+      - 'src/file-uploader/**'
+
+jobs:
+  build-and-push-file-uploader:
+   
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repo 
+        uses: actions/checkout@v4
+      - name: Build and Push File Uploader Image
+        uses: ./.github/actions/build-and-push
+        with:
+          service-name: 'file-uploader'
+          dockerfile-path: 'src/file-uploader/Dockerfile'
+          context: 'src/file-uploader'
+          tag: "${{github.sha}}"
+          dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
+          dockerhub-password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+ 

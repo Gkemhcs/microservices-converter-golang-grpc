@@ -14,7 +14,7 @@ var (
 			Name: "grpc_stream_requests_total",
 			Help: "Total number of gRPC streaming requests",
 		},
-		[]string{"method", "type"}, // type: server_stream, client_stream, bidi_stream
+		[]string{"method", "type"}, // type:  server_stream, client_stream, bidi_stream
 	)
 
 	// Histogram for stream durations

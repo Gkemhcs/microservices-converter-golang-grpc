@@ -1,0 +1,25 @@
+name: Build and Push Image to Pdf Image
+
+on:
+  push:
+    paths:
+      - 'src/image-to-pdf/**'
+
+jobs:
+  build-and-push-image-to-pdf:
+   
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repo 
+        uses: actions/checkout@v4
+      - name: Build and Push Image to Pdf Image
+        uses: ./.github/actions/build-and-push
+        with:
+          service-name: 'image-to-pdf'
+          dockerfile-path: 'src/image-to-pdf/Dockerfile'
+          context: 'src/image-to-pdf'
+          tag: "${{github.sha}}"
+          dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
+          dockerhub-password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+ 

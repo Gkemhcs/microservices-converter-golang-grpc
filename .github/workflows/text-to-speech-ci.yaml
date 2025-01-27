@@ -1,23 +1,23 @@
-name: Build and Push Docker Images
+name: Build and Push Text to Speech Image
 
 on:
   push:
     paths:
-      - 'src/frontend/**'
+      - 'src/text-to-speech/**'
 
 jobs:
-  build-and-push-frontend:
+  build-and-push-text-to-speech:
    
     runs-on: ubuntu-latest
     steps:
       - name: checkout repo 
         uses: actions/checkout@v4
-      - name: Build and Push Frontend Image
+      - name: Build and Push Text to Speech Image
         uses: ./.github/actions/build-and-push
         with:
-          service-name: 'frontend'
-          dockerfile-path: 'src/frontend/Dockerfile'
-          context: 'src/frontend'
+          service-name: 'text-to-speech'
+          dockerfile-path: 'src/text-to-speech/Dockerfile'
+          context: 'src/text-to-speech'
           tag: "${{github.sha}}"
           dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
           dockerhub-password: ${{ secrets.DOCKERHUB_PASSWORD }}

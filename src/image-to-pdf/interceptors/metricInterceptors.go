@@ -12,7 +12,7 @@ var (
 	GRPCRequestsTotal = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "grpc_stream_requests_total",
-			Help: "Total number of gRPC streaming requests",
+			Help: "Total number of  gRPC streaming requests",
 		},
 		[]string{"method", "type"}, // type: server_stream, client_stream, bidi_stream
 	)
