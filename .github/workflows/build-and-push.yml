@@ -1,22 +1,10 @@
 name: Build and Push Docker Images
-
 on:
   push:
     paths:
       - 'src/frontend/**'
-      - 'src/text-to-speech/**'
-      - 'src/video-to-audio/**'
-      - 'src/image-to-pdf/**'
-      - 'src/file-uploader/**'
-
-jobs:
-  print:
-    runs-on: ubuntu-latest 
-    steps:
-      - name : "print"
-        run: echo "${{toJson(github.event.head_commit)}}"
+jobs:  
   build-and-push-frontend:
-    if: contains(github.event.head_commit.modified, 'src/frontend/') || contains(github.event.head_commit.added, 'src/frontend/') || contains(github.event.head_commit.removed, 'src/frontend/')
     runs-on: ubuntu-latest
     steps:
       - name: Build and Push Frontend Image
@@ -27,50 +15,4 @@ jobs:
           context: 'src/frontend'
           tag: 'latest'
 
-  build-and-push-text-to-speech:
-    if: contains(github.event.head_commit.modified, 'src/text-to-speech/') || contains(github.event.head_commit.added, 'src/text-to-speech/') || contains(github.event.head_commit.removed, 'src/text-to-speech/')
-    runs-on: ubuntu-latest
-    steps:
-      - name: Build and Push Text-to-Speech Image
-        uses: ./.github/actions/build-and-push
-        with:
-          service-name: 'text-to-speech'
-          dockerfile-path: 'src/text-to-speech/Dockerfile'
-          context: 'src/text-to-speech'
-          tag: 'latest'
-
-  build-and-push-video-to-audio:
-    if: contains(github.event.head_commit.modified, 'src/video-to-audio/') || contains(github.event.head_commit.added, 'src/video-to-audio/') || contains(github.event.head_commit.removed, 'src/video-to-audio/')
-    runs-on: ubuntu-latest
-    steps:
-      - name: Build and Push Video-to-Audio Image
-        uses: ./.github/actions/build-and-push
-        with:
-          service-name: 'video-to-audio'
-          dockerfile-path: 'src/video-to-audio/Dockerfile'
-          context: 'src/video-to-audio'
-          tag: 'latest'
-
-  build-and-push-image-to-pdf:
-    if: contains(github.event.head_commit.modified, 'src/image-to-pdf/') || contains(github.event.head_commit.added, 'src/image-to-pdf/') || contains(github.event.head_commit.removed, 'src/image-to-pdf/')
-    runs-on: ubuntu-latest
-    steps:
-      - name: Build and Push Image-to-PDF Image
-        uses: ./.github/actions/build-and-push
-        with:
-          service-name: 'image-to-pdf'
-          dockerfile-path: 'src/image-to-pdf/Dockerfile'
-          context: 'src/image-to-pdf'
-          tag: 'latest'
-
-  build-and-push-file-uploader:
-    if: contains(github.event.head_commit.modified, 'src/file-uploader/') || contains(github.event.head_commit.added, 'src/file-uploader/') || contains(github.event.head_commit.removed, 'src/file-uploader/')
-    runs-on: ubuntu-latest
-    steps:
-      - name: Build and Push File-Uploader Image
-        uses: ./.github/actions/build-and-push
-        with:
-          service-name: 'file-uploader'
-          dockerfile-path: 'src/file-uploader/Dockerfile'
-          context: 'src/file-uploader'
-          tag: 'latest'
+  

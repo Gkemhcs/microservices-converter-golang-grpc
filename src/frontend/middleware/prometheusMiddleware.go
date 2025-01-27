@@ -4,18 +4,15 @@ import (
 	"net/http"
 	"time"
 
-
-
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-
 var (
-HttpRequestsTotal = prometheus.NewCounterVec(
+	HttpRequestsTotal = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "http_requests_total",
-			Help: "Total number of HTTP requests",
+			Help: "Total number  of HTTP requests",
 		},
 		[]string{"method", "route", "status"},
 	)
@@ -37,6 +34,7 @@ HttpRequestsTotal = prometheus.NewCounterVec(
 		[]string{"method", "route"},
 	)
 )
+
 func PrometheusMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		start := time.Now()
@@ -51,11 +49,11 @@ func PrometheusMiddleware() gin.HandlerFunc {
 		if route == "" {
 			route = "unknown" // Handle unmatched routes
 		}
-		
+
 		//Counter Metric
 		HttpRequestsTotal.WithLabelValues(c.Request.Method, route, http.StatusText(status)).Inc()
 		duration := time.Since(start).Seconds()
-		
+
 		//Histogram Metric
 		HttpRequestDuration.WithLabelValues(c.Request.Method, route, http.StatusText(status)).Observe(duration)
 
