@@ -29,7 +29,7 @@ var (
 	RouteLatencyGauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: "http_route_latency_seconds",
-			Help: "Gauge of the current latency (seconds) for each route",
+			Help: "Gauge of the current  latency (seconds) for each route",
 		},
 		[]string{"method", "route"},
 	)
